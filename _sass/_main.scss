@@ -43,20 +43,20 @@ a {
 
 pre {
 	background: #f7f7f7; /* Light grey background */
-	padding: .5rem;
+	/* padding: .5rem; */ 
 	overflow-x: auto; /* Ensures wide code doesn't break your layout */
 	border: 1px solid #ccc; /* subtle border */
 	box-shadow: 1px 1px 5px rgba(0,0,0,0.1); /* Soft shadow around code blocks *
-	margin: .5rem 0;
 }
 
 code,pre {
+	font-family: 'Fira Code', 'Consolas', monospace;
 	color: #333; /* Darker text for better readability */
 	/* background: rgb(236, 237, 238); */
 }
 
 code {
-	padding: .1rem;
+	/* padding: .1rem; */ 
 }
 
 pre code {
@@ -65,7 +65,7 @@ pre code {
 }
 
 pre {
-	padding: 1rem;
+	/* padding: 1rem; */
 	overflow-x: auto;
 }
 
