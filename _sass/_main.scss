@@ -25,11 +25,6 @@ a {
     text-decoration: underline;
 }
 
-pre {
-	margin: .5rem 0;
-	padding: .5rem;
-}
-
 .post p {
 	margin: .5rem 0;
 }
@@ -46,8 +41,18 @@ pre {
 	margin: 2rem 0;
 }
 
+pre {
+	background: #f7f7f7; /* Light grey background */
+	padding: .5rem;
+	overflow-x: auto; /* Ensures wide code doesn't break your layout */
+	border: 1px solid #ccc; /* subtle border */
+	box-shadow: 1px 1px 5px rgba(0,0,0,0.1); /* Soft shadow around code blocks *
+	margin: .5rem 0;
+}
+
 code,pre {
-	background: rgb(236, 237, 238);
+	color: #333; /* Darker text for better readability */
+	/* background: rgb(236, 237, 238); */
 }
 
 code {
@@ -55,7 +60,8 @@ code {
 }
 
 pre code {
-	border: none;
+	border: none; /* Removes border if specified */
+	padding: 0; /* Removes padding if specified */
 }
 
 pre {

@@ -60,3 +60,9 @@ defaults:
       type: "posts"
     values:
       layout: "post"
+
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    disable: true
