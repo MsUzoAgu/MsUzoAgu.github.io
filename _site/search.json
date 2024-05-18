@@ -2,6 +2,17 @@
   
     {
 
+      "title"    : "@Observable vs @AppStorage Conflict: Part 2",
+      "description" : "Explore the intricate relationship between @Observable and @AppStorage in SwiftUI in this detailed guide. Learn what triggers conflicts between these two features and gain insights into their operational mechanisms. Perfect for developers looking to deepen their understanding of SwiftUI&#39;s architecture and improve their coding practices",
+      "url"      : "/2024/05/05/unpacking-observable-and-appstorage-part-2",
+      "category" : "",
+      "tags"     : "swiftui, swift, observation, property wrappers, observable, appstorage",
+      "date"     : "2024-05-05 00:00:00 -0400"
+
+    } ,
+  
+    {
+
       "title"    : "@Observable vs @AppStorage Conflict: Part 1",
       "description" : "Explore the intricate relationship between @Observable and @AppStorage in SwiftUI in this detailed guide. Learn what triggers conflicts between these two features and gain insights into their operational mechanisms. Perfect for developers looking to deepen their understanding of SwiftUI&#39;s architecture and improve their coding practices",
       "url"      : "/2024/05/02/unpacking-observable-and-appstorage-part-1",
@@ -19,6 +30,17 @@
       "category" : "",
       "tags"     : "aws, google-cloud, terraform, cloudformation, devops",
       "date"     : "2021-10-31 00:00:00 -0400"
+
+    } ,
+  
+    {
+
+      "title"    : "UIPageViewController: Customizing Page Indicators",
+      "description" : "customize page indicator in UIPageViewController",
+      "url"      : "/2019/12/20/customized-page-indicators-for-uipageviewcontroller",
+      "category" : "",
+      "tags"     : "swift, uikit",
+      "date"     : "2019-12-20 00:00:00 -0500"
 
     } ,
   

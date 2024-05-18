@@ -4,13 +4,120 @@
  <title>Sidey</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-05-18T03:22:16-04:00</updated>
+ <updated>2024-05-18T04:31:21-04:00</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>@Observable vs @AppStorage Conflict: Part 2</title>
+   <link href="http://localhost:4000/2024/05/05/unpacking-observable-and-appstorage-part-2"/>
+   <updated>2024-05-05T00:00:00-04:00</updated>
+   <id>http://localhost:4000/2024/05/05/unpacking-observable-and-appstorage-part-2</id>
+   <content type="html">&lt;p&gt;In the previous article, we explored the conflict that arises when combining @Observable and @AppStorage. This follow-up provides a solution grounded in an understanding observation, identity, and the distinctions between reference and structural semantics.&lt;/p&gt;
+
+&lt;h2 id=&quot;important-background-reference-and-structural-semantics&quot;&gt;&lt;u&gt;Important Background: Reference and Structural Semantics&lt;/u&gt;&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Reference Semantics&lt;/strong&gt;: refers to objects where multiple variables can refer to the same instance in memory. Any changes made through one reference affect the underlying object and, consequently, all other references to it.&lt;/p&gt;
+
+    &lt;blockquote&gt;
+      &lt;p&gt;&lt;strong&gt;Tip&lt;/strong&gt;: Think of reference types (e.g., classes, functions) when considering reference semantics - there are are allocated in shared memory spaces and accessed via pointers.&lt;/p&gt;
+    &lt;/blockquote&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Structural Semantics: in contrast, this pertains to objects where variables hold independent copies of data. Modifications to one variable do not impact others.&lt;/p&gt;
+
+    &lt;blockquote&gt;
+      &lt;p&gt;Value types (e.g., structs, enums, tuples) are examples of structural semantics, emphasizing independent data handling&lt;/p&gt;
+    &lt;/blockquote&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;conflict-overview&quot;&gt;&lt;u&gt;Conflict Overview&lt;/u&gt;&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;@Observable&lt;/strong&gt; converts all stored properties in a class to computed properties to enable detailed observation, leveraging reference semantics for unique change tracking. Conversely, &lt;strong&gt;@AppStorage&lt;/strong&gt; is a property wrapper for direct interaction with UserDefaults, relying on its own getter and setter methods and typically aligning with structural semantics.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-solution&quot;&gt;&lt;u&gt;The Solution&lt;/u&gt;&lt;/h2&gt;
+&lt;p&gt;The key to resolving the conflict lies in ensuring that &lt;strong&gt;@AppStorage&lt;/strong&gt; adheres to reference semantics when used within an @Observable class: The &lt;a href=&quot;https://forums.swift.org/t/pitch-observation/62051#detailed-design-8&quot;&gt;design details section of the original pitch&lt;/a&gt; provides guidance:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Observation of an entity implies that entity has identity. That means that things that are observable are inherently reference types. Structural types that are not rooted in a reference semantic storage do not have a well formed concept of external observation of changes. However, if the structure is a member variable of a reference type, descendant key paths to specific values passing through structural types with a root of a reference type do make sense as being an observable field.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;To implement a solution alighed with these principles, first move properties annotated with &lt;strong&gt;@AppStorage&lt;/strong&gt; into  a reference type:&lt;/p&gt;
+
+&lt;div class=&quot;language-swift highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Storage&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;@AppStorage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;johnDoe&quot;&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;@AppStorage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;age&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;
+    
+    &lt;span class=&quot;nf&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Next the reference type, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Storage&lt;/code&gt; is integrated into an observable class (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UserSettings&lt;/code&gt;) and made a member variable of said class:&lt;/p&gt;
+
+&lt;div class=&quot;language-swift highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;SwiftUI&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;@Observable&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;UserSettings&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Storage&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;kd&quot;&gt;@AppStorage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;johnDoe&quot;&lt;/span&gt;
+        &lt;span class=&quot;kd&quot;&gt;@AppStorage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;age&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;
+        
+        &lt;span class=&quot;nf&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;storage&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Storage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Finally the property observer &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;didSet&lt;/code&gt; is added for each variable we want to observe and update:&lt;/p&gt;
+
+&lt;div class=&quot;language-swift highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;SwiftUI&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;@Observable&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;UserSettings&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Storage&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;kd&quot;&gt;@AppStorage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;johnDoe&quot;&lt;/span&gt;
+        &lt;span class=&quot;kd&quot;&gt;@AppStorage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;age&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;
+        
+        &lt;span class=&quot;nf&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;storage&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Storage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;didSet&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;age&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;Int&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;didSet&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;age&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;age&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;code-breakdown&quot;&gt;Code Breakdown:&lt;/h4&gt;
+&lt;p&gt;Each property in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UserSettings&lt;/code&gt; is backed by a corresponding property in the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Storage&lt;/code&gt; class.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Direct Access and Persistence&lt;/strong&gt;: when a property (e.g. &lt;em&gt;name&lt;/em&gt;) in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UserSettings&lt;/code&gt; is set, its &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;didSet&lt;/code&gt; observe updates the corresponding value in the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Storage&lt;/code&gt; instance, which immediately saves it in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UserDefaults&lt;/code&gt; via the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;AppStorage&lt;/code&gt; wrapper.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Initialization and Synchronization&lt;/strong&gt;: when &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UserSettings&lt;/code&gt; is initialized, it sets its properties from the corresponding values in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Stroage&lt;/code&gt;, which reads these values from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UserDefaults&lt;/code&gt;. This ensures that a user’s settings are populated with the previously saved values when the app starts. 
+With &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@AppStorage&lt;/code&gt; properties encapsulated in a distinct reference type (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Storage&lt;/code&gt;), &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UserSettings&lt;/code&gt; is able to indirectly access  &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@AppStorage&lt;/code&gt; properties through &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Storage&lt;/code&gt;, enabling observation via &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@Observable&lt;/code&gt; while avoiding direct application of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@AppStorage&lt;/code&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This approch effectively organizes data handling and observing changes in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UserSettings&lt;/code&gt; by leveraging the strengths of both &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@AppStorage&lt;/code&gt; for persistent storage and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@Observable&lt;/code&gt; for observing and responding to changes.&lt;/p&gt;
+
+</content>
+ </entry>
  
  <entry>
    <title>@Observable vs @AppStorage Conflict: Part 1</title>
@@ -301,6 +408,82 @@
     &lt;/li&gt;
   &lt;/ol&gt;
 &lt;/div&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>UIPageViewController: Customizing Page Indicators</title>
+   <link href="http://localhost:4000/2019/12/20/customized-page-indicators-for-uipageviewcontroller"/>
+   <updated>2019-12-20T00:00:00-05:00</updated>
+   <id>http://localhost:4000/2019/12/20/customized-page-indicators-for-uipageviewcontroller</id>
+   <content type="html">&lt;p&gt;Having not worked on an iOS project in a long while, I was stumped recently when I had to customize the page indicator for an onboarding screen.&lt;/p&gt;
+
+&lt;p&gt;I tend to build my views programatically but documentation for UIPageViewController does not provide information on how to programatically access the default page indication built into UIPageViewController. My guess, after trying different methods on my instance of UIPageViewController and having my google-fu fail me, is that there isn’t a way to programatically access the default page indicator.&lt;/p&gt;
+
+&lt;p&gt;The solution I implemented relies on both &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;presentationCount&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;presentationIndex&lt;/code&gt;. According to Apple’s documentation a page indicator is visible under these conditions only: 
+	- if both &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;presentationCount&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;presentationIndex&lt;/code&gt; are implemented
+	- if the transitionStyle is scroll 
+	- and if the navigation orientation is horizontal.&lt;/p&gt;
+
+&lt;p&gt;As of iOS 16, the minimal code to accomplish this:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import UIKit
+
+class OnboardingViewController: UIViewController {
+
+  private var currentIndex: Int = 0
+  private var pageController: UIPageViewController?
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    self.setupPageController()
+  }
+
+  private func setupPageController() {
+    self.pageController = UIPageViewController(
+      transitionStyle: .scroll, navigationOrientation: .horizontal)
+    self.pageController?.delegate = self
+    self.pageController?.dataSource = self
+    self.pageController?.view.backgroundColor = .systemRed
+  }
+
+  private func customizePageIndicator() {
+    let appearance = UIPageControl.appearance()
+    appearance.pageIndicatorTintColor = .systemGray
+    appearance.currentPageIndicatorTintColor = .white
+    appearance.backgroundColor = .systemRed
+  }
+
+  func presentationCount(for pageViewController: UIPageViewController) -&amp;gt; Int {
+    self.customizePageIndicator()
+    return self.onboardingContent.count
+  }
+
+  func presentationIndex(for pageViewController: UIPageViewController) -&amp;gt; Int {
+    return self.currentIndex
+  }
+}
+
+extension OnboardingViewController: UIPageViewControllerDataSource {
+
+  func pageViewController(
+    _ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController
+  ) -&amp;gt; UIViewController? {
+    // implement logic that displays next vc when user swipes to next screen
+  }
+
+  func pageViewController(
+    _ pageViewController: UIPageViewController,
+    viewControllerBefore viewController: UIViewController
+  ) -&amp;gt; UIViewController? {
+    //implement logic that displays previous viewController
+    // basically what to display when user swips back to previous screen
+  }
+}     
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;note&lt;/strong&gt;: I am using the regular ViewController as the container of the PageViewController; you don’t have to do it this way.&lt;/p&gt;
+
+&lt;p&gt;It feels counter-intutive to implement a new UIPageControl instead of using what is baked into the UIPageViewController; will have to investigate when time permits.&lt;/p&gt;
 </content>
  </entry>
  
