@@ -1,0 +1,215 @@
+:root {
+  --base-font-size: 18px; 
+  // Light theme colors
+  --background-color: #fff;
+  --text-color: rgb(22, 23, 26);
+  --link-color: #000;
+  --link-hover-color: lightsteelblue;
+  --border-color: #edf2f7;
+  --code-block-bg-color: rgb(248, 248, 248);
+  --plaintext-bg: #ffeff0; // light pink background for plaintext code in light mode
+  --plaintext-color: crimson; // bright red color for plaintext in light mode
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    // --base-font-size: 18px; // 
+    // Dark theme colors
+    --background-color: #333;
+    --text-color: #ccc;
+    --link-color: #ddd;
+    --link-hover-color: #5f9ea0;
+    --border-color: #555;
+    --code-block-bg-color: #444;
+    --plaintext-bg: #442b2d; // dark maroon as background for plaintext in dark mode
+    --plaintext-color: #ffb3b3; // soft pink for plaintext color in dark mode
+  }
+}
+
+h1 {
+  font-size: calc(2.25 * var(--base-font-size)); // 40.5px
+}
+
+h2 {
+  font-size: calc(2 * var(--base-font-size)); // 36px
+}
+
+h3 {
+  font-size: calc(1.75 * var(--base-font-size)); // 31.5px
+}
+
+h4 {
+  font-size: calc(1.5 * var(--base-font-size)); // 27px
+}
+
+h5 {
+  font-size: calc(1.25 * var(--base-font-size)); // 22.5px
+}
+
+h6 {
+  font-size: calc(1.125 * var(--base-font-size)); // 20.25px
+}
+
+h1,h2,h3,h4,h5 {
+  line-height: 1;
+  margin: 1rem 0;
+  font-weight: 600;
+}
+
+// Apply consistent font size for other text elements
+p, li, a, span, div {
+  font-size: var(--base-font-size); // 18px
+}
+
+section.post {
+  flex-basis: 0;
+  flex-grow: 999;
+  min-width: 70%;
+  display: flex;
+  flex-direction: column;
+
+  //ensures 1st header in section has no top margin
+  h1:first-child {
+    margin-top: 0;
+
+    //removes top margin from <p> immediately following the first h1
+    + p {
+        margin-top: 0;
+    }        
+  }
+
+  //general <p> styling
+  p {
+    display: block;
+    margin-top: 12px;
+  }
+
+  // 
+  code.language-plaintext {
+    background-color: lightgray;
+    // color: black;
+    // color: rosybrown;
+    // color: peru;
+    color: saddlebrown;
+    text-transform: lowercase;
+  }
+
+  h2,h3,h4,h5,h6 {
+    margin: 2rem 0 0;
+
+    // margin for <p> following headers h2 - h6
+    + p {
+      margin-top: 5px; 
+    }
+  }   
+
+  // styling for ordered and unorded lists
+  ul, ol {
+    list-style: none;
+    margin-top: 12px;
+    list-style-position: inside;
+    counter-reset: item; // resets the counter at the start of each list
+
+    li {
+      position: relative; // positions counter relative to the list item
+      margin-bottom: 24px;
+      counter-increment: item; // increments counter for each li    
+
+      &::before {
+        content: counter(item) ". "; // displays the counter before the li content
+        position: absolute; // position the counter absolutely within the li
+        left: 0; // Adjust as necessary to align the counter correctly
+        top: 0;
+      }
+
+      p {
+        margin-left: 22px;
+        margin-top: 12px; // Standard margin-top for all <p>s within lists
+
+        &:first-child {
+          margin-top: 0; // no top margin for first <p> within a list item
+          + p {
+            margin-top: 0; //no top margin for 2nd <p> immediately following 1st
+          }
+        }
+      }      
+
+      p:not(:first-child):not(:nth-child(2)) {
+        margin-top: 12px; //Standard top margin for all <p> that are not 1st or 2nd
+      }
+
+      div.language-swift.highlighter-rouge {
+        margin-left: 22px;
+      } 
+      
+      pre {
+        margin: 0; // Removes default margin from <pre> tag
+      }
+
+      details {
+        margin-left: 30px;
+
+        summary {
+          margin-left: 0px;
+        }
+      }      
+    }
+
+    // Styling for nested ul within li
+    ul {
+      counter-reset: none; // Prevent counters from continuing from parent lists
+      list-style: circle; // Choose a style that differentiates it from the outer list
+      margin-left: 20px; // Proper indentation for nested lists
+      margin-top: 5px; // Reduced top margin for nested lists
+
+      li {
+        counter-increment: none; 
+        position: static; // disable absolute positioning of counters
+        margin-left: 24px;
+        margin-bottom: 0;
+
+        &::before {
+          content: none; // No counters before nested li items
+        }
+      }
+
+      li:last-child {
+        margin-bottom: 24px;
+      }
+    }    
+  }
+
+  // ensures navigation lists do not use counters
+  nav ol, nav ul {
+    counter-reset: none; 
+    li {
+      counter-increment: none; 
+      &::before {
+        content: none; // ensures counters are not displayed in nav
+      }
+    }
+  }
+
+  // 
+  ul.nested {
+    counter-reset: none; // Prevent counters from continuing from parent lists
+    list-style: circle; // Choose a style that differentiates it from the outer list
+    margin-left: 20px; // Proper indentation for nested lists
+    margin-top: 5px; // Reduced top margin for nested lists
+
+    li {
+      counter-increment: none; 
+      position: static; // disable absolute positioning of counters
+      margin-left: 24px;
+      margin-bottom: 0;
+
+      &::before {
+        content: none; // No counters before nested li items
+      }
+    }
+
+    li:last-child {
+      margin-bottom: 24px;
+    }
+  }  
+}

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Terraform - Operational vs Provisioned Resources
+title: "TF: Operational vs Provisioned Resources"
 description: getting started with Terraform correctly
 summary: getting started with Terraform correctly 
 comments: true
