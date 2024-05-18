@@ -7,7 +7,7 @@ comments: true
 tags: [swiftui, swift, observation, property wrappers, observable, appstorage]
 ---
 
-In the previous article, we explored the conflict that arises when combining @Observable and @AppStorage. This follow-up provides a solution grounded in an understanding observation, identity, and the distinctions between reference and structural semantics.
+In a [previous article](https://msuzoagu.github.io/2024/05/02/unpacking-observable-and-appstorage-part-1), we explored the conflict that arises when combining @Observable and @AppStorage. This follow-up provides a solution grounded in an understanding of Observation, identity, reference and structural semantics.
 
 ## <u>Important Background: Reference and Structural Semantics</u>
 
@@ -40,7 +40,7 @@ class Storage {
 }
 ``` 
 
-Next the reference type, `Storage` is integrated into an observable class (`UserSettings`) and made a member variable of said class: 
+Next the reference type, `Storage`, is integrated into an observable class (`UserSettings`) and made a member variable of said class: 
 
 ```swift
 import SwiftUI

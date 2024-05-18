@@ -4,7 +4,7 @@
  <title>Sidey</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-05-18T04:31:21-04:00</updated>
+ <updated>2024-05-18T04:37:08-04:00</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -17,7 +17,7 @@
    <link href="http://localhost:4000/2024/05/05/unpacking-observable-and-appstorage-part-2"/>
    <updated>2024-05-05T00:00:00-04:00</updated>
    <id>http://localhost:4000/2024/05/05/unpacking-observable-and-appstorage-part-2</id>
-   <content type="html">&lt;p&gt;In the previous article, we explored the conflict that arises when combining @Observable and @AppStorage. This follow-up provides a solution grounded in an understanding observation, identity, and the distinctions between reference and structural semantics.&lt;/p&gt;
+   <content type="html">&lt;p&gt;In a &lt;a href=&quot;https://msuzoagu.github.io/2024/05/02/unpacking-observable-and-appstorage-part-1&quot;&gt;previous article&lt;/a&gt;, we explored the conflict that arises when combining @Observable and @AppStorage. This follow-up provides a solution grounded in an understanding of Observation, identity, reference and structural semantics.&lt;/p&gt;
 
 &lt;h2 id=&quot;important-background-reference-and-structural-semantics&quot;&gt;&lt;u&gt;Important Background: Reference and Structural Semantics&lt;/u&gt;&lt;/h2&gt;
 
@@ -59,7 +59,7 @@
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Next the reference type, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Storage&lt;/code&gt; is integrated into an observable class (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UserSettings&lt;/code&gt;) and made a member variable of said class:&lt;/p&gt;
+&lt;p&gt;Next the reference type, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Storage&lt;/code&gt;, is integrated into an observable class (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UserSettings&lt;/code&gt;) and made a member variable of said class:&lt;/p&gt;
 
 &lt;div class=&quot;language-swift highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;SwiftUI&lt;/span&gt;
 &lt;span class=&quot;kd&quot;&gt;@Observable&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;UserSettings&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
