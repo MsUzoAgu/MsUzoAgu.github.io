@@ -1,25 +1,10 @@
-# Sidey
+# Live Preview Instructions
 
-Sidey is a simple and minimalistic jekyll blogging theme.
+- cd into root directory
+- run `jekyll serve`, which 
+	- runs `jekyll build` (builds site and outputs a static site to _site dir)
+	- runs site on local web server at http://localhost:4000, rebuilding the site any time you make a change.
 
-### Features
+### Drafts
 
-- Responsive design
-- Inline CSS
-- Anchor headings
-- Search
-- Tags & tag pages
-- Security headers (for Netlify hosting)
-- 404 page
-- Compressed CSS and HTML
-- 100/100 score on Lighthouse, Page Speed Insights & Webpagetest
-- Robots.txt
-- Atom & Json feeds
-- Sass
-- Seo optimized (Twitter cards, Facebook Open Graph, Schema.org)
-- Ultra fast (Only ~5kb of CSS)
-- Sidebar navigation
-
-### Screenshot
-
-![Screenshot](screenshot.png)
+- are in `_drafts` dir and gitignored
